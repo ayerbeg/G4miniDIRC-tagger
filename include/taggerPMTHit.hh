@@ -1,0 +1,101 @@
+#ifndef taggerPMTHit_h
+#define taggerPMTHit_h 1
+
+#include "G4VHit.hh"
+#include "G4THitsCollection.hh"
+#include "G4Allocator.hh"
+#include "G4ThreeVector.hh"
+#include "G4Threading.hh"
+
+
+
+class taggerPMTHit : public G4VHit
+{
+public:
+  taggerPMTHit() = default;
+  taggerPMTHit(G4int layerID);
+  taggerPMTHit(const taggerPMTHit &right) = default;
+  ~taggerPMTHit() override = default;
+
+  taggerPMTHit& operator=(const taggerPMTHit &right) = default;
+  G4bool operator==(const taggerPMTHit &right) const;
+
+  inline void *operator new(size_t);
+  inline void operator delete(void *aHit);
+
+  void Draw() override;
+  const std::map<G4String,G4AttDef>* GetAttDefs() const override;
+  std::vector<G4AttValue>* CreateAttValues() const override;
+ // void Print() override;
+
+  void SetLayerID(G4int z) { fLayerID = z; }
+  G4int GetLayerID() const { return fLayerID; }
+
+  void SetTime(G4double t) { fTime = t; }
+  G4double GetTime() const { return fTime; }
+
+  void SetLocalPos(G4ThreeVector xyz) { fLocalPos = xyz; }
+  G4ThreeVector GetLocalPos() const { return fLocalPos; }
+
+  void SetWorldPos(G4ThreeVector xyz) { fWorldPos = xyz; }
+  G4ThreeVector GetWorldPos() const { return fWorldPos; }
+
+  void Add(G4double de);
+  G4double GetEdep() const;
+
+  void SetLevel(G4int xyz) { iLevel = xyz; }
+  G4int GetLevel() const { return iLevel; }
+
+  void SetPDG(G4int xyz) { iPDG = xyz; }
+  G4int GetPDG() const { return iPDG; }
+
+private:
+  G4int fLayerID = -1;
+
+  G4double fTime = 0.;
+  G4ThreeVector fLocalPos;
+  G4ThreeVector fWorldPos;
+  G4double fEdep = 0.;
+
+  G4int iLevel = 0;
+  G4int iPDG = 0;
+
+ 
+  
+
+  
+};
+
+using taggerPMTHitsCollection = G4THitsCollection<taggerPMTHit>;
+
+extern G4ThreadLocal G4Allocator<taggerPMTHit>* taggerPMTHitAllocator;
+
+inline void* taggerPMTHit::operator new(size_t)
+{
+  if (!taggerPMTHitAllocator) {
+    taggerPMTHitAllocator = new G4Allocator<taggerPMTHit>;
+  }
+  return (void*)taggerPMTHitAllocator->MallocSingle();
+}
+
+inline void taggerPMTHit::operator delete(void* aHit)
+{
+  taggerPMTHitAllocator->FreeSingle((taggerPMTHit*) aHit);
+}
+
+inline G4double taggerPMTHit::GetEdep() const {
+  return fEdep;
+}
+
+inline void taggerPMTHit::Add(G4double de)
+{
+  // G4cout<<"fEdep (1): "<<fEdep<<G4endl;
+  //  G4cout<<"de: "<<de<<G4endl;
+  fEdep += de;
+  //  G4cout<<"fEdep (2): "<<fEdep<<G4endl;
+
+}
+
+
+
+#endif
