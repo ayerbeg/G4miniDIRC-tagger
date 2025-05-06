@@ -44,6 +44,40 @@ TaggerDetectorConstruction::~TaggerDetectorConstruction()
 
 void TaggerDetectorConstruction::DefineMaterials()
 {
+
+  // Vacuum and air are just to test the optical properties
+  // inside the tagger volume
+
+  // Vacuum
+  new G4Material("Galactic", 1., 1.01*g/mole, universe_mean_density,
+    kStateGas, 2.73*kelvin, 3.e-18*pascal);
+
+  G4Material* Air = G4NistManager::Instance()->FindOrBuildMaterial("G4_AIR");
+
+//  defaultMaterial = G4Material::GetMaterial("Galactic");
+  defaultMaterial = Air;
+
+    // Define photon energy range
+  G4double AirphotonEnergy[] = {2.0 * eV, 3.5 * eV}; // Visible light range
+  const G4int AirnEntries = sizeof(AirphotonEnergy) / sizeof(G4double);
+
+  // Define refractive index for air
+  G4double AirrefractiveIndex[] = {1.0003, 1.0003}; // Refractive index for air
+  assert(sizeof(AirrefractiveIndex) == sizeof(AirphotonEnergy));
+
+  // Define absorption length for air
+  G4double AirabsorptionLength[] = {10 * km, 10 * km}; // Absorption length for air
+  assert(sizeof(AirabsorptionLength) == sizeof(AirphotonEnergy));
+
+  // Create material properties table for air
+  G4MaterialPropertiesTable* airMPT = new G4MaterialPropertiesTable();
+  airMPT->AddProperty("RINDEX", AirphotonEnergy, AirrefractiveIndex, AirnEntries);
+  airMPT->AddProperty("ABSLENGTH", AirphotonEnergy, AirabsorptionLength, AirnEntries);
+
+  // Assign the material properties table to air
+  Air->SetMaterialPropertiesTable(airMPT);
+// Test materials *******************************************************
+
   // Materials for the tagger
 C  = new G4Element("Carbon"  ,"C" , 6., 12.01*g/mole);//name, symbol, Z, A
 O  = new G4Element("Oxygen"  ,"O" , 8., 16.00*g/mole);//name, symbol, Z, A
@@ -83,6 +117,8 @@ CO2MPT->AddProperty("RINDEX", photonEnergy, refractiveIndex, nEntries);
 CO2MPT->AddProperty("ABSLENGTH", photonEnergy, absorption, nEntries);
 
 CO2->SetMaterialPropertiesTable(CO2MPT);
+
+
 //***********From Copilot****************************** */
 
 Al = new G4Element("Aluminum", "Al", 13., 26.98*g/mole);
@@ -129,6 +165,8 @@ MPTAluminizedMylar->AddProperty("REFLECTIVITY", photonEnergy, reflectivityAlMyla
  Acrylic->AddElement(H, 8);
  Acrylic->AddElement(O, 2);
 
+
+
 //////////////////////////////////////////////////////////////////
 //               ACRYLIC Optical properties
 // from copilot. I found a more complex parameterization here:
@@ -137,32 +175,47 @@ MPTAluminizedMylar->AddProperty("REFLECTIVITY", photonEnergy, reflectivityAlMyla
 // in the array. The enerygy is not in increasing order.
 //////////////////////////////////////////////////////////////////
  
-const G4int nAcryEntries = 10;
-G4double AcryphotonEnergy[nAcryEntries] = {
-    1.77*eV, 2.07*eV, 2.48*eV, 2.76*eV, 3.10*eV,
-    3.54*eV, 3.88*eV, 4.13*eV, 4.43*eV, 4.96*eV
+
+const G4int nAcryEntries = 9;
+// Define photon energy in increasing order
+G4double AcryPhotonEnergy[nAcryEntries] = {
+  1.55*eV, 1.77*eV, 2.07*eV, 2.48*eV, 3.1*eV,
+  3.54*eV, 4.13*eV, 4.96*eV, 6.2*eV
 };
+
+// Define absorption length (in meters) corresponding to the sorted photon energy
+G4double AcryAbsorptionLength[nAcryEntries] = {
+  10.0*m, 50.0*m, 100.0*m, 50.0*m, 20.0*m,
+  10.0*m, 1.0*m, 0.1*m, 0.01*m
+};
+
 
 // Refractive index for acrylic
-G4double AcryrefractiveIndex[nAcryEntries] = {
-    1.489, 1.490, 1.491, 1.492, 1.493,
-    1.494, 1.495, 1.496, 1.497, 1.498
-};
+//G4double AcryrefractiveIndex[nAcryEntries] = {
+//  1.489, 1.490, 1.491, 1.492, 1.493,
+ // 1.494, 1.495, 1.496, 1.497, 1.498
+//};
 
-// Absorption length for acrylic (in meters) //it's that true?
-G4double AcryabsorptionLength[nAcryEntries] = {
-    10*m, 10*m, 10*m, 10*m, 10*m,
-    10*m, 10*m, 10*m, 10*m, 10*m
+// Roman suggester to remove the refractive index property
+// but then Cherenkov light is not reflected
+// I set the refractive index to 1.0 
+// but with that absorption length, not sure why the acrylic is useful  
+G4double AcryRefractiveIndex[nAcryEntries] = {
+  1., 1., 1., 1., 1.,
+  1., 1., 1., 1.
 };
 
 // Create material properties table for acrylic
 G4MaterialPropertiesTable* MPT_Acrylic = new G4MaterialPropertiesTable();
-MPT_Acrylic->AddProperty("RINDEX", AcryphotonEnergy, AcryrefractiveIndex, nEntries);
-MPT_Acrylic->AddProperty("ABSLENGTH", AcryphotonEnergy, AcryabsorptionLength, nEntries);
+// From Roman, removing the refractive index, remove the Cherenkov light  
+MPT_Acrylic->AddProperty("RINDEX", AcryPhotonEnergy, AcryRefractiveIndex, nAcryEntries);
+MPT_Acrylic->AddProperty("ABSLENGTH", AcryPhotonEnergy, AcryAbsorptionLength, nAcryEntries);
 
  
 Acrylic->SetMaterialPropertiesTable(MPT_Acrylic);
 
+// Perhaps Acrylic should be removed. Extra code and probably memory
+// consumption, and maybe useless for the simulation. 
 //////////////////////////////////////////////////////////////////
 
 
@@ -246,12 +299,49 @@ G4Material* diskMaterial = G4Material::GetMaterial("Aluminum");
   22.701,  23.391,  23.908,  24.023,  23.448,  23.103,  21.954,  18.563,  12.471,   3.563,   0.92,    0.517};
   
 
+// from Roman https://github.com/rdom/crdirc/blob/master/src/PrtStackingAction.cxx#L94
+// [200,850] nm with 2 nm step
+// quantum efficiency data from Alex Britting, Jan 25, 2011
+// unit is percent
+// first value is at 200 nm, last at 700 nm
+// credible range start around 250nm, >= 280nm to be safe
 
+  double eff_9002224[326] = {
+    2.21, -24.6, -27,   -10.8, -6.2,  -8.2, -14.8, -19.9, -14.1, -14,  -22.4, -21.9, -13.8, -16.1,
+    -7.3, -9.26, -7.43, -4.04, -0.49, 2.86, 4.55,  5.34,  10.1,  8.51, 8.35,  11,    11.6,  12.9,
+    12.6, 13.1,  13.8,  13.7,  13.8,  13.7, 13.9,  13.8,  14.1,  14.6, 15,    15.4,  15.8,  16.2,
+    16.4, 16.8,  17.1,  17.3,  17.6,  17.6, 17.9,  18,    18,    18.1, 18.2,  18.3,  18.3,  18.4,
+    18.4, 18.4,  18.4,  18.5,  18.7,  18.7, 18.9,  19.1,  19.3,  19.5, 19.6,  19.7,  19.7,  19.8,
+    19.8, 19.8,  19.6,  19.6,  19.6,  19.6, 19.5,  19.5,  19.5,  19.6, 19.7,  19.6,  19.8,  19.9,
+    20.1, 20.3,  20.3,  20.6,  20.7,  20.8, 20.9,  21,    21,    21,   21,    20.9,  20.9,  20.9,
+    20.8, 20.6,  20.4,  20.4,  20.2,  20.1, 19.9,  19.7,  19.8,  19.6, 19.4,  19.4,  19.2,  19,
+    18.8, 18.6,  18.5,  18.3,  18.1,  18.1, 17.9,  17.7,  17.5,  17.4, 17.2,  17.1,  16.9,  16.7,
+    16.5, 16.4,  15.9,  15.7,  15.1,  14.6, 14.7,  14.4,  14.3,  14,   13.6,  13.3,  13.1,  12.9,
+    12.8, 12.5,  12.2,  12,    11.9,  11.7, 11.5,  11.3,  11.2,  11.1, 10.9,  10.8,  10.7,  10.5,
+    10.3, 10,    9.73,  9.33,  8.86,  8.34, 7.86,  7.27,  6.91,  6.48, 6.01,  5.85,  5.32,  5.04,
+    4.76, 4.56,  4.36,  4.17,  3.98,  3.82, 3.69,  3.54,  3.41,  3.27, 3.16,  3.03,  2.92,  2.8,
+    2.7,  2.59,  2.49,  2.4,   2.3,   2.2,  2.11,  2.03,  1.94,  1.85, 1.76,  1.68,  1.61,  1.52,
+    1.46, 1.37,  1.29,  1.24,  1.17,  1.11, 1.05,  0.99,  0.94,  0.89, 0.83,  0.79,  0.76,  0.7,
+    0.66, 0.63,  0.6,   0.56,  0.53,  0.51, 0.48,  0.46,  0.44,  0.42, 0.4,   0.4,   0.4,   0.38,
+    0.37, 0.36,  0.37,  0.35,  0.34,  0.35, 0.35,  0.35,  0.36,  0.35, 0.33,  0.31,  0.3,   0.28,
+    0.27, 0.26,  0.25,  0.23,  0.22,  0.21, 0.2,   0.18,  0.18,  0.17, 0.17,  0.14,  0.16,  0.16,
+    0.16, 0.16,  0.16,  0.16,  0.16,  0.16, 0.16,  0.15,  0.15,  0.15, 0.16,  0.16,  0.17,  0.17,
+    0.17, 0.17,  0.16,  0.15,  0.15,  0.16, 0.16,  0.16,  0.16,  0.17, 0.18,  0.17,  0.16,  0.15,
+    0.16, 0.18,  0.18,  0.17,  0.15,  0.08, 0.13,  0.16,  0.17,  0.17, 0.18,  0.18,  0.18,  0.18,
+    0.17, 0.17,  0.17,  0.14,  0.14,  0.15, 0.16,  0.15,  0.14,  0.15, 0.16,  0.16,  0.16,  0.15,
+    0.14, 0.13,  0.13,  0.11,  0.08,  0,    0.01,  0.03,  0.02,  0.04, 0.07,  0,     0.05,  0.09,
+    0.07, 0.1,   0.14,  0.17};
 
+  // Convert the energy from eV to nm
+  // The energy is in eV, the wavelength in nm
+    for (int i = 0; i < 326; i++) 
+    {
+        lambda[i] = 200 + i * 2;
 
-
+        en_phoCath_Roman[325-i] = 1240 / lambda[i] * eV; // Convert to eV
+    }
   
-  MPTBorosilicateGlass->AddProperty("EFFICIENCY", en_photonCathode, qe_photonCathode, num);
+  MPTBorosilicateGlass->AddProperty("EFFICIENCY", en_phoCath_Roman, eff_9002224, 325);
 
 
   BorosilicateGlass->SetMaterialPropertiesTable(MPTBorosilicateGlass);
@@ -347,7 +437,7 @@ Gas = new G4UnionSolid("Main_Gas+Ext_Gas", MainGas, ExtGas,0,
 
 
 GasLV = new G4LogicalVolume(Gas,       // its solid
-					                    CO2,  // its material
+  		                        CO2,  // its material
 					                    "GasLV");         // its name
 	      
 new G4PVPlacement(nullptr,                                                    // no rotation

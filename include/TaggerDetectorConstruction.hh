@@ -51,7 +51,7 @@ class TaggerDetectorConstruction
   G4Material* BorosilicateGlass;
 
   G4Material* Acrylic;
-
+  G4Material* defaultMaterial; 
 
   G4MaterialPropertiesTable* MPTBorosilicateGlass;
     // data members
@@ -106,8 +106,8 @@ G4Tubs* PMT;
 G4LogicalVolume* PMTLV;
 G4String SDname = "taggerPMT";
 
-
-
+G4double lambda[326];
+G4double en_phoCath_Roman[326];
 
     static G4ThreadLocal G4GlobalMagFieldMessenger*  fMagFieldMessenger;
                                       // magnetic field messenger

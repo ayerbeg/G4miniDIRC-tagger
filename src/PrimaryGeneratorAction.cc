@@ -28,7 +28,7 @@ PrimaryGeneratorAction::PrimaryGeneratorAction()
 
   //fParticleGun->SetParticleMomentumDirection(G4ThreeVector(-0.2,0.,-1.));
  
-  fParticleGun->SetParticleEnergy(4.*GeV);
+  fParticleGun->SetParticleEnergy(2*GeV);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -88,8 +88,8 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 
  G4cout << "Gun position: " << fParticleGun->GetParticlePosition()/m << G4endl;
 
-  // Set the particle energy
-  fParticleGun->SetParticleEnergy(4.*GeV);
+  // Set the particle energy. 4GeV muon energy at sea level, according to the PDG 
+  fParticleGun->SetParticleEnergy(4*GeV);
 
   // Set the particle momentum direction
 
@@ -115,6 +115,7 @@ G4double pz =  -cos(angle) ;
 fParticleGun->SetParticleMomentumDirection(G4ThreeVector(px, py, pz));
 
 G4cout << "Gun momentum direction: " << fParticleGun->GetParticleMomentumDirection() << G4endl;
+G4cout << "Gun energy: "<< fParticleGun->GetParticleEnergy()/GeV << G4endl;
 // fParticleGun->SetParticlePosition(G4ThreeVector(-30*cm,0.,0.));  
 //  fParticleGun->SetParticlePosition(G4ThreeVector(40*cm,0.,100.*cm));  
 
