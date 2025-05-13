@@ -49,6 +49,11 @@ public:
   void SetPDG(G4int xyz) { iPDG = xyz; }
   G4int GetPDG() const { return iPDG; }
 
+  void SetHitParentID(G4int xyz) { iParentID = xyz; } //I add the word "Hit" to avoid confusion with the G4TrackID
+  G4int GetHitParentID() const { return iParentID; }
+
+
+
 private:
   G4int fLayerID = -1;
 
@@ -60,7 +65,7 @@ private:
   G4int iLevel = 0;
   G4int iPDG = 0;
 
- 
+  G4int iParentID = 0;
   
 
   

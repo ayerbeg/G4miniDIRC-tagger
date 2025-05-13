@@ -27,7 +27,7 @@ HistoManager::~HistoManager()
 
 void HistoManager::Readme(G4int idx)
 {
-  G4cout << "HistoManager::Readme() :"<<  EnePho[idx] << " "<< idx<< G4endl;
+ // G4cout << "HistoManager::Readme() :"<<  EnePho[idx] << " "<< idx<< G4endl;
   
 }
 
@@ -58,33 +58,12 @@ void HistoManager::Book()
   
   taggerana = new TTree("taggerana","tagger analysis");
   
-  // This method works, do we need structure? 
-  // hodotree ->Branch("EventID",event.EventID,"EventID/I");
-  // hodotree ->Branch("EDepTot",&event.EDepTot,"EDepTot/D");
-  // hodotree ->Branch("paddle",&event.paddle,"paddle/I");
-
-
-
-
-  // GEM 
-  //local coordinates
-  taggerana -> Branch("nPho", &nPho,"nPho/I"); 
-  taggerana -> Branch("EnePho", &EnePho );
-  /*
-  gemana -> Branch("vZloc", &vZloc );
-  //global coordinates
-  gemana -> Branch("vXglo", &vXglo );
-  gemana -> Branch("vYglo", &vYglo );
-  gemana -> Branch("vZglo", &vZglo );
-  
-  gemana -> Branch("vTchamber", &vTchamber );
-  gemana -> Branch("vChamber", &vChamber );
-  gemana -> Branch("vgPDG",  &vgPDG );
-  gemana -> Branch("vgLevel",  &vgLevel );
-*/
-
-
-  
+  taggerana -> Branch("event", &event,"event/I"); //event number
+  taggerana -> Branch("det_n_Pho", &det_n_Pho,"det_n_Pho/I"); //number of photons detected
+  taggerana -> Branch("pro_n_Pho", &pro_n_Pho,"pro_n_Pho/I"); //number of Cerenkov photons produced
+  taggerana -> Branch("det_Ene_Pho", &det_Ene_Pho ); //energy of the photons detected (actually the wavelength)
+  taggerana -> Branch("pro_Ene_Pho", &pro_Ene_Pho ); //energy of the photons produced (actually the wavelength)
+  taggerana -> Branch("det_ParentID", &det_ParentID ); 
   
  
 }
@@ -152,18 +131,20 @@ void HistoManager::FillNtuple1(G4double energyAbs, G4double energyGap,
 }
 
 
+void HistoManager::Filltagger(G4int ID, 
+                              G4int inPho, 
+                              G4int fCerenkovCounter, 
+                              vector<G4double> vCheEnePho, 
+                              vector<G4double> vEnePho,
+                              vector<G4int> eParentID)
 
-
-
-
-void HistoManager::Filltagger(G4int ID, G4int inPho, vector<G4double> vEnePho)
 {
 
   
   //G4cout<<"Filling tagger"<<G4endl;
   //  G4cout<<"EVentID: "<< fEventID<<" EDepTot: "<< fEDepTot <<" paddle: "<< fpaddle<<G4endl;
 
-  fEventID = ID;
+  event = ID;
   
 //  G4cout<<"***EVentID: "<<ID<<G4endl;
  
@@ -173,20 +154,31 @@ void HistoManager::Filltagger(G4int ID, G4int inPho, vector<G4double> vEnePho)
 G4double c = 2.99792458e17; // Speed of light in nm/s
 G4double h = 4.135667696e-15; // Planck's constant in eV*s
 
-nPho = inPho;
+det_n_Pho = inPho;
 
 for(int kk = 0; kk<vEnePho.size(); kk++)
   {
-    EnePho.push_back((c*h) / (vEnePho[kk]/eV))  ;
+    det_Ene_Pho.push_back((c*h) / (vEnePho[kk]/eV))  ;
+  }
+
+  for(int kk = 0; kk<vCheEnePho.size(); kk++)
+  {
+    pro_Ene_Pho.push_back((c*h) / (vCheEnePho[kk]))  ;
   }
   // The energy of the photon in eV
 
+  pro_n_Pho = fCerenkovCounter;
+  det_ParentID = eParentID;
   // The variables are filled in the corresponding detector classes.
+  
   taggerana ->Fill();
    
-  
-  EnePho.clear();
- 
+
+  det_n_Pho = 0;
+  pro_n_Pho = 0;
+  det_Ene_Pho.clear();
+  pro_Ene_Pho.clear();
+  det_ParentID.clear();
 }
 
 

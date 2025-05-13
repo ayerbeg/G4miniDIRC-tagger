@@ -66,6 +66,7 @@ G4bool taggerPMTSD::ProcessHits(G4Step* step,
   
   auto hit = new taggerPMTHit(copyNo);
 
+  G4int iParentID = step->GetTrack()-> GetParentID();  
 
   // this is similar to the SteppingAction analysis
   // But I don't know how this behave with multiple
@@ -79,7 +80,7 @@ G4bool taggerPMTSD::ProcessHits(G4Step* step,
 
   hit->SetPDG(PDGID);
   hit->SetLevel(ParticleLevel);
-
+  hit->SetHitParentID(iParentID);
   fHitsCollection->insert(hit);
 
   return true;
@@ -100,7 +101,7 @@ void taggerPMTSD::EndOfEvent(G4HCofThisEvent*)
      G4cout
        << G4endl
        << "-------->Hits Collection: in this event they are " << nofHits
-       << " hits in the tracker chambers: " << G4endl;
+       << " hits in the PMT. " << G4endl;
      for ( std::size_t i=0; i<nofHits; ++i ) (*fHitsCollection)[i]->Print();
   }
 }

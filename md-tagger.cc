@@ -139,8 +139,8 @@ auto runManager = new G4RunManager(); // Use single-threaded RunManager
   auto UImanager = G4UImanager::GetUIpointer();
 
   // CHOOSE BETWEEN BATCH MODE AND UI SESSION
-  //bool GUI = true; // actually true is terminal mode, false is GUI mode
-  bool GUI = false; // actually true is terminal mode, false is GUI mode
+  bool GUI = true; // actually true is terminal mode, false is GUI mode
+  //bool GUI = false; // actually true is terminal mode, false is GUI mode
   // Process macro or start UI sessionui
   //
   if (macro.size())

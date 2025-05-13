@@ -101,23 +101,33 @@ auto nhit = hc->GetSize();
    
 
 
-
-
 for (unsigned long i = 0; i < nhit; ++i)
   {
    taggerPMTHit *hit = static_cast<taggerPMTHit*>(hc->GetHit(i));
     
-   EnePho.push_back(hit -> GetEdep());
+  EnePho.push_back(hit -> GetEdep());
 
+  if(hit -> GetHitParentID()>1)
+    G4cout << "ParentID: " << hit -> GetHitParentID() << G4endl;
+
+    eParentID.push_back(hit -> GetHitParentID()); // this is the parent ID of the photon DETECTED
 
   }
 
+
+
 //G4cout<<"EventAction::EndOfEventAction "<< nhit <<G4endl;
+G4cout<<"Event #: "<<eventID<<" fCerenkovCounter "<<  fCerenkovCounter <<G4endl;
 
-fHistoManager -> Filltagger(eventID, nhit, EnePho);
+fHistoManager -> Filltagger(eventID, nhit, fCerenkovCounter, CheEnePho, EnePho, eParentID);
+
+
+
+
 EnePho.clear();
-
-
+fCerenkovCounter = 0;
+CheEnePho.clear();
+eParentID.clear();
 
 
 }

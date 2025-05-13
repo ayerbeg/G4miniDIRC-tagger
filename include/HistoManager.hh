@@ -39,7 +39,8 @@ public:
 
   void FillHodoEnergy(G4int ID);
   void FillHodoPosition(G4int ID);
-  void Filltagger(G4int ID, G4int nPho, vector<G4double> EnePho);
+  void Filltagger(G4int ID, G4int nPho, G4int, vector<G4double>, vector<G4double>, vector<G4int>);
+
   
 
   void PrintStatistic();
@@ -86,8 +87,8 @@ public:
 
 
 
-  void AddNofPho(G4int v){nPho;}
-  void AddEnePhot(G4double v){EnePho.push_back(v);}
+  void AddNofPho(G4int v){det_n_Pho;}
+  void AddEnePhot(G4double v){det_Ene_Pho.push_back(v);}
 
 
   
@@ -129,9 +130,12 @@ private:
   vector<G4double> vTbar;
   vector<G4int> vTrackID;
 
-
-  G4int  nPho = 0;
-  vector<G4double> EnePho;
+  G4int  event = 0;
+  G4int  det_n_Pho = 0;
+  G4int  pro_n_Pho = 0;
+  vector<G4double> det_Ene_Pho;
+  vector<G4double> pro_Ene_Pho;
+  vector<G4int> det_ParentID;
 
   
   // These variables only for position at the bars

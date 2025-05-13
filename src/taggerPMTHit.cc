@@ -90,21 +90,3 @@ std::vector<G4AttValue>* taggerPMTHit::CreateAttValues() const
 
   return values;
 }
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-/*
-void taggerPMTHit::Print()
-{
-  G4cout << "  Layer[" << fLayerID << "] : time " << fTime/ns
-	 << " (nsec) --- local (x,y) " << fLocalPos.x()
-	 << ", " << fLocalPos.y()
-	 << " --- World " << fWorldPos.x()/m
-	 << ", " << fWorldPos.y()/m
-	 << " -- Energy: "<< fEdep/eV
-	 << G4endl;
-}
-*/
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-
-

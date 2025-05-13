@@ -3,10 +3,17 @@
 
 #include <G4UserStackingAction.hh>
 #include <G4ClassificationOfNewTrack.hh>
+#include <vector>
+#include "globals.hh"
+
+using namespace std;
+
+class EventAction;
 
 class StackingAction : public G4UserStackingAction {
 public:
-    StackingAction();
+  //  StackingAction();
+    StackingAction(EventAction* eventAction);
     virtual ~StackingAction();
 
     // Called for each new track
@@ -19,8 +26,10 @@ public:
     virtual void PrepareNewEvent() override;
 
     private:
-
+    EventAction* fEventAction = nullptr; // Pointer to the EventAction
     int fCerenkovCounter;
+
+    vector<G4double> EneChePho;
 
 };
 

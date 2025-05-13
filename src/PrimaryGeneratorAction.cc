@@ -86,7 +86,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
  fParticleGun->SetParticlePosition(G4ThreeVector(x, y, z));
 // fParticleGun->SetParticlePosition(G4ThreeVector(0, 0, -z));
 
- G4cout << "Gun position: " << fParticleGun->GetParticlePosition()/m << G4endl;
+ G4cout << "\nEvent #: "<<anEvent->GetEventID()<<" Gun position: " << fParticleGun->GetParticlePosition()/m << G4endl;
 
   // Set the particle energy. 4GeV muon energy at sea level, according to the PDG 
   fParticleGun->SetParticleEnergy(4*GeV);
